@@ -16,6 +16,7 @@ class GoodsController extends Controller
 
     public function getListGoods(Request $request) {
         $good = Good::where('name', 'like', '%' . $request->name . '%');
+        $good->where('quantity', '>', 0);
 
         return $this->respondWithSuccess($good->get());
     }

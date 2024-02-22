@@ -16,7 +16,10 @@ class SellController extends Controller
                 $model->where('sells.status', $request->status ?? 0);
             }
 
-            $model->where('sells.user_id', $request->user()->id);
+            if($request->user()->hasRole('staff')) {
+                $model->where('sells.user_id', $request->user()->id);
+            }
+
             $model->leftJoin('sell_approvals', 'sells.id', '=', 'sell_approvals.sell_id');
             $model->join('users', 'sells.user_id', '=', 'users.id');
             $model->select('sells.*', 'users.name as user_name', 'sell_approvals.code as approval_code');

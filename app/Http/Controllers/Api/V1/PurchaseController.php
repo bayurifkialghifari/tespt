@@ -16,7 +16,10 @@ class PurchaseController extends Controller
                 $model->where('purchases.status', $request->status ?? 0);
             }
 
-            $model->where('purchases.user_id', $request->user()->id);
+            if($request->user()->hasRole('staff')) {
+                $model->where('purchases.user_id', $request->user()->id);
+            }
+
             $model->leftJoin('purchase_approvals', 'purchases.id', '=', 'purchase_approvals.purchase_id');
             $model->join('users', 'purchases.user_id', '=', 'users.id');
             $model->select('purchases.*', 'users.name as user_name', 'purchase_approvals.code as approval_code');

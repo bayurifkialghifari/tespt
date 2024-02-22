@@ -1,3 +1,14 @@
+# User
+
+```
+email:
+admin@admin.com
+staff@staff.com
+keeper@keeper.com
+
+password: password
+```
+
 # Waduh
 
 ```

@@ -34,9 +34,17 @@ class RoleSeeder extends Seeder
     ];
     public $routeStaff = [
         'cms.dashboard',
+        'cms.purchase',
+        'cms.purchase.detail',
+        'cms.sell',
+        'cms.sell.detail',
     ];
     public $routeKeepr = [
         'cms.dashboard',
+        'cms.purchase.approval',
+        'cms.purchase.approval.detail',
+        'cms.sell.approval',
+        'cms.sell.approval.detail',
     ];
 
     public function run(): void
@@ -59,6 +67,13 @@ class RoleSeeder extends Seeder
                     $permission = Permission::findOrCreate($permission, 'web');
 
                     $admin->givePermissionTo($permission);
+
+                    if(in_array($route, $this->routeStaff)) {
+                        $staff->givePermissionTo($permission);
+                    }
+                    if(in_array($route, $this->routeKeepr)) {
+                        $keeper->givePermissionTo($permission);
+                    }
                 }
             }
         }

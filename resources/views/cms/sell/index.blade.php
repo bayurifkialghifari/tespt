@@ -66,6 +66,9 @@
                                 </x-new-update-delete>
                             </tr>
                         </template>
+                        <tr x-show="data.length == 0">
+                            <td colspan="6" class="text-center">Data Tidak Ditemukan</td>
+                        </tr>
                     </tbody>
                 </table>
 

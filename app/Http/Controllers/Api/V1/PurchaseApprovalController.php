@@ -40,6 +40,14 @@ class PurchaseApprovalController extends Controller
             Purchase::where('id', $request->purchase_id)->update([
                 'status' => 1
             ]);
+
+            // Add stok to goods
+            $purchase = Purchase::find($request->purchase_id);
+            foreach($purchase->purchaseDetails as $purchaseDetail) {
+                $purchaseDetail->goods()->update([
+                    'quantity' => $purchaseDetail->goods->quantity + $purchaseDetail->quantity
+                ]);
+            }
         }
 
         return $this->respondWithSuccess();

@@ -146,7 +146,7 @@
                             this.detail = res
                             this.detail.statusText = res.status == 0 ? 'Menunggu Persetujuan' : res.status == 1 ? 'Disetujui' : 'Ditolak'
                             this.detail.purchaseApprovals = {
-                                code: res.purchase_approvals.code ?? '',
+                                code: res?.purchase_approvals?.code ?? '',
                             }
                             this.data = res.purchase_details
                         })

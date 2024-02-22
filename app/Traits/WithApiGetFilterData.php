@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 
 trait WithApiGetFilterData {
 
-    public function getDataWithFilter(Model|Builder $model, Request $request) {
+    public function getDataWithFilter(Model|Builder $model, Request $request, $callback = null, $searchAble = []) {
         $new_model = clone $model;
 
         // Get list field available in the model
-        $list_field = $new_model->getFillable();
+        $list_field = $searchAble ? $searchAble : $new_model->getFillable();
         $search = $request->input('search');
 
         // If search is not null
@@ -29,6 +29,10 @@ trait WithApiGetFilterData {
         }
 
         $model = $model->orderBy($request->input('sort', 'created_at'), $request->input('order', 'desc'));
+
+        if ($callback) {
+            $model = $callback($model, $request);
+        }
 
         return $model->paginate($request->input('per_page', 10));
     }

@@ -6,11 +6,18 @@ use App\Models\Good;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\GetAllRequest;
 use App\Http\Requests\Api\V1\Good\CreateUpdateRequest;
+use Illuminate\Http\Request;
 
 class GoodsController extends Controller
 {
     public function get(GetAllRequest $request) {
         return $this->respondWithSuccess($this->getDataWithFilter(new Good, $request));
+    }
+
+    public function getListGoods(Request $request) {
+        $good = Good::where('name', 'like', '%' . $request->name . '%');
+
+        return $this->respondWithSuccess($good->get());
     }
 
     public function getDetail($id) {

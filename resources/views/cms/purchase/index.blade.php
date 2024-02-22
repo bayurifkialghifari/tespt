@@ -1,6 +1,6 @@
 <x-layouts.app>
     @php
-        $title = 'Barang';
+        $title = 'Pembelian';
     @endphp
     <x-slot:title>
         {{ $title }}
@@ -19,11 +19,12 @@
                 <table class="table table-hover table-striped" style="width:100%">
                     <thead>
                         <tr>
-                            <x-new-th text="Nama" field="name" />
-                            <x-new-th text="Harga" field="price" />
-                            <x-new-th text="Gambar" field="image" />
-                            <x-new-th text="Deskripsi" field="description" />
-                            <x-new-th text="Stok" field="quantity" />
+                            <x-new-th text="Staff" field="users.name" />
+                            <x-new-th text="Barang" field="goods.name" />
+                            <x-new-th text="Harga" field="purchases.price" />
+                            <x-new-th text="Jumlah" field="purchases.quantity" />
+                            <x-new-th text="Total" field="purchases.total" />
+                            <x-new-th text="status" field="purchases.status" />
                             <th>
                                 Action
                             </th>
@@ -32,17 +33,17 @@
                     <tbody>
                         <template x-for="(value, index) in data">
                             <tr>
-                                <td x-text="value.name"></td>
+                                <td x-text="value.user_name"></td>
+                                <td x-text="value.good_name"></td>
                                 <td x-text="value.price"></td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary" x-on:click="showImage(value.image)" x-show="value.image != null">
-                                        <i class="fa fa-eye"></i>
-                                        Lihat Gambar
-                                    </button>
-                                </td>
-                                <td x-text="value.description"></td>
                                 <td x-text="value.quantity"></td>
-                                <x-new-update-delete />
+                                <td x-text="value.total"></td>
+                                <td>
+                                    <span x-show="value.status == 0" class="badge bg-warning">Menunggu Persetujuan</span>
+                                    <span x-show="value.status == 1" class="badge bg-success">Disetujui</span>
+                                    <span x-show="value.status == 2" class="badge bg-danger">Ditolak</span>
+                                </td>
+                                <x-new-update-delete x-show="value.status == 0" />
                             </tr>
                         </template>
                     </tbody>
@@ -53,41 +54,36 @@
                 </div>
             </div>
         </div>
-        <x-acc-modal x-ref="showImageModal">
-            <img src="" class="img-fluid" x-ref="showImage">
-        </x-acc-modal>
         {{-- Create / Update Modal --}}
         <x-acc-modal x-ref="modal">
             <x-new-form x-on:submit.prevent="save">
                 <div class="col-md-12">
                     <div class="mb-3">
-                        <label class="form-label">Nama</label>
-                        <input type="text" x-model="form.name" class="form-control" placeholder="Nama">
+                        <label class="form-label">Barang</label>
+                        <select x-model="form.good_id" class="form-control">
+                            <option value="">--Pilih Barang--</option>
+                            <template x-for="(value, index) in goods">
+                                <option :value="value.id" x-text="value.name"></option>
+                            </template>
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="mb-3">
                         <label class="form-label">Harga</label>
-                        <input type="number" x-model="form.price" class="form-control" placeholder="Harga">
+                        <input type="number" x-model="form.price" class="form-control" placeholder="Harga" readonly>
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="mb-3">
-                        <label class="form-label">Gambar</label>
-                        <img src="" alt="logo" class="img-fluid" x-ref="reviewImage" x-show="form.image != ''">
-                        <input type="file" x-on:change="uploadImage($event)" class="form-control" accept="image/*" x-ref="imageInput">
+                        <label class="form-label">Jumlah</label>
+                        <input type="number" x-model="form.quantity" class="form-control" placeholder="Jumlah" x-on:input="calculateTotal">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="mb-3">
-                        <label class="form-label">Deskripsi</label>
-                        <textarea x-model="form.description" class="form-control" placeholder="Deskripsi"></textarea>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="mb-3">
-                        <label class="form-label">Stok</label>
-                        <input type="number" x-model="form.quantity" class="form-control" placeholder="Stok">
+                        <label class="form-label">Total</label>
+                        <input type="number" x-model="form.total" class="form-control" placeholder="Total" readonly>
                     </div>
                 </div>
             </x-new-form>
@@ -101,19 +97,24 @@
                     isUpdate: false,
                     modalTitle: 'Buat {{ $title }}',
                     search: '',
-                    sort: 'name',
+                    sort: 'users.name',
                     order: 'desc',
                     form: {
-                        name: '',
+                        good_id: '',
                         price: '',
-                        image: '',
-                        description: '',
                         quantity: '',
+                        total: '',
                     },
                     current_page: 1,
                     total_page: null,
-                    baseUrl: '/goods/',
+                    baseUrl: '/purchase/',
                     data: [],
+                    goods: [],
+                    getAllGodds() {
+                        window.axios.get('/good-like').then((response) => {
+                            this.goods = response.data.data
+                        })
+                    },
                     getAllData() {
                         const url = `${this.baseUrl}?sort=${this.sort}&order=${this.order}&search=${this.search}&page=${this.current_page}`
 
@@ -138,30 +139,45 @@
 
                         this.getAllData()
                     },
+                    calculateTotal() {
+                        // If price is not empty
+                        if(this.form.price) {
+                            this.form.total = this.form.price * this.form.quantity
+                        } else {
+                            window.Toast.fire({
+                                icon: 'error',
+                                title: 'Barang belum dipilih.',
+                            })
+
+                            this.form.total = 0
+                        }
+                    },
                     create() {
-                        this.$refs.imageInput.value = null
                         this.isUpdate = false
                         this.modalTitle = 'Buat {{ $title }}'
                         new bootstrap.Modal(this.$refs.modal).show()
 
                         this.form = {
-                            name: '',
+                            good_id: '',
                             price: '',
-                            image: '',
-                            description: '',
                             quantity: '',
+                            total: '',
                         }
                     },
                     update(id) {
-                        this.$refs.imageInput.value = null
                         this.isUpdate = true
                         this.modalTitle = 'Update {{ $title }}'
                         new bootstrap.Modal(this.$refs.modal).show()
 
 
                         window.axios.get(`${this.baseUrl}${id}`).then((response) => {
-                            this.form = response.data.data
-                            this.$refs.reviewImage.src = `{{ url('/storage${this.baseUrl}${this.form.image}') }}`
+                            const res = response.data.data
+
+                            this.form.id = res.id
+                            this.form.good_id = res.good_id
+                            this.form.price = res.price
+                            this.form.quantity = res.quantity
+                            this.form.total = res.price * res.quantity
                         })
                     },
                     save() {
@@ -214,29 +230,22 @@
                             })
                         })
                     },
-                    showImage(url) {
-                        new bootstrap.Modal(this.$refs.showImageModal).show()
-                        this.$refs.showImage.src = `{{ url('/storage${this.baseUrl}${url}') }}`
-                    },
-                    uploadImage($event) {
-                        const formData = new FormData
-                        formData.append('save_to', 'goods')
-                        formData.append('image', $event.target.files[0])
-
-                        this.$refs.reviewImage.src = URL.createObjectURL($event.target.files[0])
-
-                        window.axios.post('/service/upload-image', formData, {
-                            headers: {
-                                'Content-Type': 'multipart/form-data'
-                            }
-                        }).then(response => {
-                            this.form.image = response.data.data.filename
-                        })
-                    },
                     init() {
                         this.getAllData()
+                        this.getAllGodds()
                         this.$watch('search', () => {
                             this.getAllData()
+                        })
+                        // Good id on change
+                        this.$watch('form.good_id', () => {
+                            if(this.form.good_id) {
+                                window.axios.get(`goods/${this.form.good_id}`).then((response) => {
+                                    const res = response.data
+
+                                    this.form.price = res.data.price
+                                    this.calculateTotal()
+                                })
+                            }
                         })
                     }
                 }))

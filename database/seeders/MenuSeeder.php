@@ -30,6 +30,14 @@ class MenuSeeder extends Seeder
                 'route' => 'cms.goods',
                 'ordering' => '2',
             ],
+            [
+                'name' => 'Pembelian',
+                'on' => 'cms',
+                'type' => 'item',
+                'icon' => 'box',
+                'route' => 'cms.purchase',
+                'ordering' => '3',
+            ],
             // Settings
             [
                 'name' => 'Settings',

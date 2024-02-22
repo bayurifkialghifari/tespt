@@ -10,6 +10,7 @@ Route::group([
 
     Route::get('/', App\Livewire\Dashboard::class)->name('dashboard');
     Route::get('/goods', fn () => view('cms.goods.index'))->name('goods');
+    Route::get('/purchase', fn () => view('cms.purchase.index'))->name('purchase');
 
     // Management
     Route::get('/management/menu', App\Livewire\Cms\Management\Menu::class)->name('management.menu');

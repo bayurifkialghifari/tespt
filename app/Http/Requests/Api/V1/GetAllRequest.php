@@ -16,7 +16,7 @@ class GetAllRequest extends FormRequest
             'per_page' => 'nullable|integer|min:1|max:100',
             'search' => 'nullable|string',
             'order' => 'nullable|in:asc,desc',
-            'sort' => 'nullable|in:id,name,price,created_at,updated_at',
+            'sort' => 'nullable',
         ];
     }
 }

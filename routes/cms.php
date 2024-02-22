@@ -11,6 +11,9 @@ Route::group([
     Route::get('/', App\Livewire\Dashboard::class)->name('dashboard');
     Route::get('/goods', fn () => view('cms.goods.index'))->name('goods');
     Route::get('/purchase', fn () => view('cms.purchase.index'))->name('purchase');
+    Route::get('/purchase/detail/{id?}', fn () => view('cms.purchase.detail'))->name('purchase.detail');
+    Route::get('/purchase-approval', fn () => view('cms.purchase.index'))->name('purchase-approval');
+
 
     // Management
     Route::get('/management/menu', App\Livewire\Cms\Management\Menu::class)->name('management.menu');

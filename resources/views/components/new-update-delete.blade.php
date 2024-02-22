@@ -3,6 +3,7 @@
     'delete' => true,
 ])
 <td>
+    {!! $slot ?? '' !!}
     @if($edit)
         <button class="btn btn-warning" x-on:click="update(value.id)" {{ $attributes }}>
             <i class="fas fa-edit" ></i>

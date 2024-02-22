@@ -38,6 +38,14 @@ class MenuSeeder extends Seeder
                 'route' => 'cms.purchase',
                 'ordering' => '3',
             ],
+            [
+                'name' => 'Pembelian Persetujuan',
+                'on' => 'cms',
+                'type' => 'item',
+                'icon' => 'alert-triangle',
+                'route' => 'cms.purchase-approval',
+                'ordering' => '4',
+            ],
             // Settings
             [
                 'name' => 'Settings',

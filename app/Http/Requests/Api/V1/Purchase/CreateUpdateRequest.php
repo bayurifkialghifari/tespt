@@ -13,9 +13,6 @@ class CreateUpdateRequest extends FormRequest
     {
         return [
             'user_id' => 'required|exists:users,id',
-            'good_id' => 'required|exists:goods,id',
-            'quantity' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
         ];
     }
 
@@ -23,7 +20,7 @@ class CreateUpdateRequest extends FormRequest
     public function prepareForValidation()
     {
         $this->merge([
-            'user_id' => $this->user()->id
+            'user_id' => $this->user()->id,
         ]);
     }
 }

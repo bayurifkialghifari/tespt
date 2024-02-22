@@ -21,6 +21,17 @@ Route::group([
     Route::get('/purchase', [App\Http\Controllers\Api\V1\PurchaseController::class, 'get'])->name('purchase');
     Route::get('/purchase/{id}', [App\Http\Controllers\Api\V1\PurchaseController::class, 'getDetail'])->name('purchase.detail');
     Route::post('/purchase', [App\Http\Controllers\Api\V1\PurchaseController::class, 'create'])->name('purchase.create');
-    Route::put('/purchase/{id}', [App\Http\Controllers\Api\V1\PurchaseController::class, 'update'])->name('purchase.update');
     Route::delete('/purchase/{id}', [App\Http\Controllers\Api\V1\PurchaseController::class, 'delete'])->name('purchase.delete');
+
+    // Purchase Details
+    Route::get('/purchase-detail/{id}', [App\Http\Controllers\Api\V1\PurchaseDetailController::class, 'getDetail'])->name('purchase-detail.detail');
+    Route::post('/purchase-detail', [App\Http\Controllers\Api\V1\PurchaseDetailController::class, 'create'])->name('purchase-detail.create');
+    Route::put('/purchase-detail/{id}', [App\Http\Controllers\Api\V1\PurchaseDetailController::class, 'update'])->name('purchase-detail.update');
+    Route::delete('/purchase-detail/{id}', [App\Http\Controllers\Api\V1\PurchaseDetailController::class, 'delete'])->name('purchase-detail.delete');
+
+    // Get purchase approval
+    Route::get('/purchase-approval', [App\Http\Controllers\Api\V1\PurchaseApprovalController::class, 'get'])->name('purchase-approval');
+    // Route::get('/purchase-approval/{id}', [App\Http\Controllers\Api\V1\PurchaseApprovalController::class, 'getDetail'])->name('purchase-approval.detail');
+    // Route::post('/purchase-approval', [App\Http\Controllers\Api\V1\PurchaseApprovalController::class, 'create'])->name('purchase-approval.create');
+    // Route::put('/purchase-approval', [App\Http\Controllers\Api\V1\PurchaseApprovalController::class, 'update'])->name('purchase-approval.update');
 });

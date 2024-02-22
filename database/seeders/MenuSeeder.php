@@ -22,7 +22,14 @@ class MenuSeeder extends Seeder
                 'ordering' => '1',
             ],
             // Master Data
-
+            [
+                'name' => 'Barang',
+                'on' => 'cms',
+                'type' => 'item',
+                'icon' => 'box',
+                'route' => 'cms.goods',
+                'ordering' => '2',
+            ],
             // Settings
             [
                 'name' => 'Settings',

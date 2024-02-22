@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Traits\isApiRequest;
 use Illuminate\Foundation\Http\FormRequest;
 
 class GetAllRequest extends FormRequest

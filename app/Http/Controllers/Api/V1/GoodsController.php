@@ -25,6 +25,14 @@ class GoodsController extends Controller
         return $this->responseWithCreated(Good::create($request->validated()));
     }
 
+    public function update($id, CreateUpdateRequest $request) {
+        $good = Good::find($id);
+
+        if (!$good) return $this->respondNotFound();
+
+        return $this->respondWithSuccess($good->update($request->validated()));
+    }
+
     public function delete($id) {
         $good = Good::find($id);
 

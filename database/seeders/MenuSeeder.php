@@ -46,6 +46,22 @@ class MenuSeeder extends Seeder
                 'route' => 'cms.purchase.approval',
                 'ordering' => '4',
             ],
+            [
+                'name' => 'Pengambilan',
+                'on' => 'cms',
+                'type' => 'item',
+                'icon' => 'box',
+                'route' => 'cms.sell',
+                'ordering' => '5',
+            ],
+            [
+                'name' => 'Pengambilan Persetujuan',
+                'on' => 'cms',
+                'type' => 'item',
+                'icon' => 'alert-triangle',
+                'route' => 'cms.sell.approval',
+                'ordering' => '6',
+            ],
             // Settings
             [
                 'name' => 'Settings',

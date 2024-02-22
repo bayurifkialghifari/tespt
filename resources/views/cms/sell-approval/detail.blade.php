@@ -1,6 +1,6 @@
 <x-layouts.app>
     @php
-        $title = 'Pembelian Persetujuan Detail';
+        $title = 'Pengambilan Persetujuan Detail';
     @endphp
     <x-slot:title>
         {{ $title }}
@@ -12,7 +12,7 @@
     <div class="card" x-data="data">
         <div class="card-header">
             <h5 class="card-title">{{ $title ?? '' }} Data</h5>
-            <a href="{{ route('cms.purchase.approval') }}" class="btn btn-danger">
+            <a href="{{ route('cms.sell.approval') }}" class="btn btn-danger">
                 <i class="fas fa-arrow-left"></i>
                 Kembali
             </a>
@@ -22,7 +22,7 @@
                 <div class="col-md-12" x-show="detail.status == 1">
                     <div class="mb-3">
                         <label class="form-label">Kode</label>
-                        <input type="text" class="form-control" x-model="detail.purchaseApprovals.code" readonly />
+                        <input type="text" class="form-control" x-model="detail.sellApproval.code" readonly />
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -118,12 +118,12 @@
                 Alpine.data('data', () => ({
                     isApprove: false,
                     modalTitle: 'Persetujuan Pembelian',
-                    baseUrl: '/purchase/',
+                    baseUrl: '/sells/',
                     form: [],
                     data: [],
                     detail: {
                         user: [],
-                        purchaseApprovals: {
+                        sellApproval: {
                             code: '',
                         },
                     },
@@ -135,16 +135,16 @@
 
                             this.detail = res
                             this.detail.statusText = res.status == 0 ? 'Menunggu Persetujuan' : res.status == 1 ? 'Disetujui' : 'Ditolak'
-                            this.detail.purchaseApprovals = {
-                                code: res?.purchase_approvals?.code ?? '',
+                            this.detail.sellApproval = {
+                                code: res?.sell_approval?.code ?? '',
                             }
-                            this.data = res.purchase_details
+                            this.data = res.sell_details
                         })
                     },
                     approve() {
                         this.isApprove = true
                         this.form = {
-                            purchase_id: this.detail.id,
+                            sell_id: this.detail.id,
                             is_approved: 1,
                             reject_reason: '',
                         }
@@ -153,14 +153,14 @@
                     reject() {
                         this.isApprove = false
                         this.form = {
-                            purchase_id: this.detail.id,
+                            sell_id: this.detail.id,
                             is_approved: 0,
                             reject_reason: '',
                         }
                         new bootstrap.Modal(this.$refs.modal).show()
                     },
                     save() {
-                        window.axios.post('/purchase-approval', this.form).then((response) => {
+                        window.axios.post('/sells-approval', this.form).then((response) => {
                             this.getAllData()
                             const modal = bootstrap.Modal.getInstance(this.$refs.modal)
                             modal.hide()

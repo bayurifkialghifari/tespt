@@ -3,22 +3,22 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\PurchaseApproval\ChangeStatusRequest;
-use App\Models\Purchase;
-use App\Models\PurchaseApproval;
+use App\Http\Requests\Api\V1\SellApproval\ChangeStatusRequest;
+use App\Models\Sell;
+use App\Models\SellApproval;
 
-class PurchaseApprovalController extends Controller
+class SellApprovalController extends Controller
 {
     public function changeStatus(ChangeStatusRequest $request) {
         $request->validated();
 
         // Check if purchase approval is exist
-        $purchaseApproval = PurchaseApproval::where('purchase_id', $request->purchase_id)->first();
+        $purchaseApproval = SellApproval::where('sell_id', $request->sell_id)->first();
 
         // Update or create if not exist
         if(!$purchaseApproval) {
-            $purchaseApproval = PurchaseApproval::create([
-                'purchase_id' => $request->purchase_id,
+            $purchaseApproval = SellApproval::create([
+                'sell_id' => $request->sell_id,
                 'user_id' => $request->user_id,
                 'code' => $request->is_approved ? $this->generateCode() : '-',
                 'is_approved' => $request->is_approved,
@@ -30,20 +30,20 @@ class PurchaseApprovalController extends Controller
         }
 
         if($request->is_approved == 0) {
-            Purchase::where('id', $request->purchase_id)->update([
+            Sell::where('id', $request->sell_id)->update([
                 'status' => 2,
                 'reject_reason' => $request->reject_reason
             ]);
         } else {
-            Purchase::where('id', $request->purchase_id)->update([
+            Sell::where('id', $request->sell_id)->update([
                 'status' => 1
             ]);
 
             // Add stok to goods
-            $purchase = Purchase::find($request->purchase_id);
-            foreach($purchase->purchaseDetails as $purchaseDetail) {
-                $purchaseDetail->goods()->update([
-                    'quantity' => $purchaseDetail->goods->quantity + $purchaseDetail->quantity
+            $purchase = Sell::find($request->sell_id);
+            foreach($purchase->sellDetails as $sellDetails) {
+                $sellDetails->goods()->update([
+                    'quantity' => $sellDetails->goods->quantity - $sellDetails->quantity
                 ]);
             }
         }
@@ -52,6 +52,6 @@ class PurchaseApprovalController extends Controller
     }
 
     public function generateCode() {
-        return 'WH-IN-' . date('d-m-Y') . '-' . PurchaseApproval::count() + 1;
+        return 'WH-OUT-' . date('d-m-Y') . '-' . SellApproval::count() + 1;
     }
 }

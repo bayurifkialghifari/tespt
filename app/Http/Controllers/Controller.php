@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Traits\WithApiGetFilterData;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 
 class Controller extends BaseController
 {
-    use AuthorizesRequests, ValidatesRequests;
+    use AuthorizesRequests, ValidatesRequests, WithApiGetFilterData;
 
     public function respondWithSuccess($data = null, $message = 'Success', $code = 200)
     {

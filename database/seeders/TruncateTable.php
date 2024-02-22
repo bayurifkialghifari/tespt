@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Good;
 use App\Models\Setting;
 use App\Models\Menu;
 use App\Models\User;
@@ -17,5 +18,6 @@ class TruncateTable extends Seeder
         Setting::truncate();
         User::truncate();
         Menu::truncate();
+        Good::truncate();
     }
 }

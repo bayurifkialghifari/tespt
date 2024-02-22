@@ -32,10 +32,10 @@ class RoleSeeder extends Seeder
         'password.update',
         'logout',
     ];
-    public $routeNotulen = [
+    public $routeStaff = [
         'cms.dashboard',
     ];
-    public $routePegawai = [
+    public $routeKeepr = [
         'cms.dashboard',
     ];
 
@@ -43,8 +43,8 @@ class RoleSeeder extends Seeder
     {
         // Hotel app
         $admin = Role::findOrCreate('admin', 'web');
-        $notulen = Role::findOrCreate('notulen', 'web');
-        $pegawai = Role::findOrCreate('pegawai', 'web');
+        $staff = Role::findOrCreate('staff', 'web');
+        $keeper = Role::findOrCreate('keeper', 'web');
 
         // Generate Permission
         // Get all route names
@@ -58,29 +58,7 @@ class RoleSeeder extends Seeder
                     $permission = $type . '.' . $route;
                     $permission = Permission::findOrCreate($permission, 'web');
 
-                    // Give admin permission
-                    // if(!in_array($route, [
-                    //     'cms.',
-                    // ])) {
-                        $admin->givePermissionTo($permission);
-                    // }
-
-                    // Give notulen permission
-                    if(in_array($route, $this->routeNotulen)) {
-                        // if($route == 'cms.master.hotel' ) {
-                            // Where menu hotel, give permission only to view and edit
-                            // if($type == 'view' || $type == 'update') {
-                                $notulen->givePermissionTo($permission);
-                            // }
-                        // } else {
-                        //     $notulen->givePermissionTo($permission);
-                        // }
-                    }
-
-                    // Give pegawai permission
-                    if(in_array($route, $this->routePegawai)) {
-                        $pegawai->givePermissionTo($permission);
-                    }
+                    $admin->givePermissionTo($permission);
                 }
             }
         }

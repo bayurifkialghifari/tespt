@@ -64,30 +64,6 @@ class MenuSeeder extends Seeder
                 'route' => 'cms.management.setting',
                 'ordering' => '35',
             ],
-            [
-                'name' => 'Access Control',
-                'on' => 'cms',
-                'type' => 'item',
-                'icon' => 'key',
-                'route' => 'cms.management.access-control',
-                'ordering' => '36',
-            ],
-            [
-                'name' => 'Privacy Policies',
-                'on' => 'cms',
-                'type' => 'item',
-                'icon' => 'file',
-                'route' => 'cms.management.privacy-policy',
-                'ordering' => '37',
-            ],
-            [
-                'name' => 'Terms Of Service',
-                'on' => 'cms',
-                'type' => 'item',
-                'icon' => 'file',
-                'route' => 'cms.management.term-of-service',
-                'ordering' => '38',
-            ],
         ]);
     }
 }

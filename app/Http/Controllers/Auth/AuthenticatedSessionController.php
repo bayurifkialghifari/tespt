@@ -29,8 +29,9 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // If not admin redirect to
-        // if(auth()->user()->roles->pluck('name')[0] !== 'admin') return redirect()->intended(RouteServiceProvider::DEFAULT);
+        // Generate JWT token and save to session
+        $token = auth()->user()->createToken('MyAppToken')->plainTextToken;
+        $request->session()->put('jwt_token', $token);
 
         return redirect()->intended(RouteServiceProvider::HOME);
     }

@@ -34,7 +34,12 @@
                             <tr>
                                 <td x-text="value.name"></td>
                                 <td x-text="value.price"></td>
-                                <td x-text="value.image"></td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" x-on:click="showImage(value.image)" x-show="value.image != null">
+                                        <i class="fa fa-eye"></i>
+                                        Lihat Gambar
+                                    </button>
+                                </td>
                                 <td x-text="value.description"></td>
                                 <td x-text="value.quantity"></td>
                                 <x-new-update-delete />
@@ -48,6 +53,9 @@
                 </div>
             </div>
         </div>
+        <x-acc-modal x-ref="showImageModal">
+            <img src="" class="img-fluid" x-ref="showImage">
+        </x-acc-modal>
         {{-- Create / Update Modal --}}
         <x-acc-modal x-ref="modal">
             <x-new-form x-on:submit.prevent="save">
@@ -66,7 +74,8 @@
                 <div class="col-md-12">
                     <div class="mb-3">
                         <label class="form-label">Image</label>
-                        <input type="file" x-on:change="uploadImage($event)" class="form-control">
+                        <img src="" alt="logo" class="img-fluid" x-ref="reviewImage" x-show="form.image != ''">
+                        <input type="file" x-on:change="uploadImage($event)" class="form-control" accept="image/*" x-ref="imageInput">
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -103,9 +112,10 @@
                     },
                     current_page: 1,
                     total_page: null,
+                    baseUrl: '/goods/',
                     data: [],
                     getAllData() {
-                        const url = `/goods?sort=${this.sort}&order=${this.order}&search=${this.search}&page=${this.current_page}`
+                        const url = `${this.baseUrl}?sort=${this.sort}&order=${this.order}&search=${this.search}&page=${this.current_page}`
 
                         window.axios.get(url).then((response) => {
                             const res = response.data.data
@@ -129,6 +139,7 @@
                         this.getAllData()
                     },
                     create() {
+                        this.$refs.imageInput.value = null
                         this.isUpdate = false
                         this.modalTitle = 'Buat Barang'
                         new bootstrap.Modal(this.$refs.modal).show()
@@ -142,20 +153,23 @@
                         }
                     },
                     update(id) {
+                        this.$refs.imageInput.value = null
                         this.isUpdate = true
                         this.modalTitle = 'Update Barang'
                         new bootstrap.Modal(this.$refs.modal).show()
 
-                        window.axios.get(`/goods/${id}`).then((response) => {
+
+                        window.axios.get(`${this.baseUrl}${id}`).then((response) => {
                             this.form = response.data.data
+                            this.$refs.reviewImage.src = `{{ url('/storage${this.baseUrl}${this.form.image}') }}`
                         })
                     },
                     save() {
                         let request
                         if (this.isUpdate) {
-                            request = window.axios.put(`/goods/${this.form.id}`, this.form)
+                            request = window.axios.put(`${this.baseUrl}${this.form.id}`, this.form)
                         } else {
-                            request = window.axios.post('/goods', this.form)
+                            request = window.axios.post(this.baseUrl, this.form)
                         }
 
                         request.then(response => {
@@ -187,7 +201,7 @@
                         })
                     },
                     delete(id) {
-                        window.axios.delete('/goods/' + id).then((response) => {
+                        window.axios.delete(this.baseUrl + id).then((response) => {
                             this.getAllData()
                             window.Toast.fire({
                                 icon: 'success',
@@ -200,21 +214,30 @@
                             })
                         })
                     },
+                    showImage(url) {
+                        new bootstrap.Modal(this.$refs.showImageModal).show()
+                        this.$refs.showImage.src = `{{ url('/storage${this.baseUrl}${url}') }}`
+                    },
                     uploadImage($event) {
-                        const formData = new FormData;
+                        const formData = new FormData
                         formData.append('save_to', 'goods')
                         formData.append('image', $event.target.files[0])
+
+                        this.$refs.reviewImage.src = URL.createObjectURL($event.target.files[0])
 
                         window.axios.post('/service/upload-image', formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data'
                             }
                         }).then(response => {
-                            this.form.image = response.data.filename
+                            this.form.image = response.data.data.filename
                         })
                     },
                     init() {
                         this.getAllData()
+                        this.$watch('search', () => {
+                            this.getAllData()
+                        })
                     }
                 }))
             })

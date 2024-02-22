@@ -8,7 +8,7 @@
                     <span class="input-group-text" id="search-icon">
                         <i class="align-middle" data-feather="search"></i>
                     </span>
-                    <input x-model="search" type="text" class="form-control" aria-label="Search" aria-describedby="search-icon" placeholder="Search...">
+                    <input x-model.debounce.250ms="search" type="text" class="form-control" aria-label="Search" aria-describedby="search-icon" placeholder="Search...">
                 </div>
             </div>
         @endif

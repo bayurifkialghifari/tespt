@@ -31,7 +31,5 @@ Route::group([
 
     // Get purchase approval
     Route::get('/purchase-approval', [App\Http\Controllers\Api\V1\PurchaseApprovalController::class, 'get'])->name('purchase-approval');
-    // Route::get('/purchase-approval/{id}', [App\Http\Controllers\Api\V1\PurchaseApprovalController::class, 'getDetail'])->name('purchase-approval.detail');
-    // Route::post('/purchase-approval', [App\Http\Controllers\Api\V1\PurchaseApprovalController::class, 'create'])->name('purchase-approval.create');
-    // Route::put('/purchase-approval', [App\Http\Controllers\Api\V1\PurchaseApprovalController::class, 'update'])->name('purchase-approval.update');
+    Route::post('/purchase-approval', [App\Http\Controllers\Api\V1\PurchaseApprovalController::class, 'changeStatus'])->name('purchase-approval.change-status');
 });

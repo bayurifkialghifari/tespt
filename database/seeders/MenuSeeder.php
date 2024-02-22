@@ -43,7 +43,7 @@ class MenuSeeder extends Seeder
                 'on' => 'cms',
                 'type' => 'item',
                 'icon' => 'alert-triangle',
-                'route' => 'cms.purchase-approval',
+                'route' => 'cms.purchase.approval',
                 'ordering' => '4',
             ],
             // Settings

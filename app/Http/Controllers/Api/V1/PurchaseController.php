@@ -11,9 +11,10 @@ class PurchaseController extends Controller
 {
     public function get(GetAllRequest $request) {
         return $this->respondWithSuccess($this->getDataWithFilter(new Purchase, $request, callback: function ($model, $request) {
-            $model->where('user_id', $request->user()->id);
+            $model->where('purchases.user_id', $request->user()->id);
+            $model->leftJoin('purchase_approvals', 'purchases.id', '=', 'purchase_approvals.purchase_id');
             $model->join('users', 'purchases.user_id', '=', 'users.id');
-            $model->select('purchases.*', 'users.name as user_name');
+            $model->select('purchases.*', 'users.name as user_name', 'purchase_approvals.code as approval_code');
 
             return $model;
         }, searchAble: [
@@ -21,11 +22,12 @@ class PurchaseController extends Controller
             'purchases.total_price',
             'purchases.total_items',
             'purchases.created_at',
+            'purchase_approvals.code',
         ]));
     }
 
     public function getDetail($id) {
-        $good = Purchase::with('purchaseDetails', 'purchaseDetails.goods', 'user')->find($id);
+        $good = Purchase::with('purchaseDetails', 'purchaseDetails.goods', 'user', 'purchaseApprovals')->find($id);
 
         if (!$good) return $this->respondNotFound();
 

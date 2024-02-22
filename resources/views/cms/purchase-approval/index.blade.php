@@ -1,6 +1,6 @@
 <x-layouts.app>
     @php
-        $title = 'Pembelian';
+        $title = 'Pembelian Persetujuan';
     @endphp
     <x-slot:title>
         {{ $title }}
@@ -15,10 +15,11 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <x-new-header />
+                <x-new-header :isCreate="false" />
                 <table class="table table-hover table-striped" style="width:100%">
                     <thead>
                         <tr>
+                            <x-new-th text="Kode" field="purchase_approvals.code" />
                             <x-new-th text="Staff" field="users.name" />
                             <x-new-th text="Total Barang" field="purchases.total_items" />
                             <x-new-th text="Total Harga" field="purchases.total_price" />
@@ -32,6 +33,7 @@
                     <tbody>
                         <template x-for="(value, index) in data">
                             <tr>
+                                <td x-text="value.approval_code ?? '-'"></td>
                                 <td x-text="value.user_name"></td>
                                 <td x-text="new Intl.NumberFormat('id').format(value.total_items)"></td>
                                 <td x-text="new Intl.NumberFormat('id').format(value.total_price)"></td>
@@ -41,9 +43,10 @@
                                     <span x-show="value.status == 1" class="badge bg-success">Disetujui</span>
                                     <span x-show="value.status == 2" class="badge bg-danger">Ditolak</span>
                                 </td>
-                                <x-new-update-delete x-show="value.status == 0" :edit="false">
-                                    <a :href="`{{ route('cms.purchase.detail') }}/${value.id}`" class="btn btn-primary">
-                                        Detail Data
+                                <x-new-update-delete x-show="value.status == 0" :edit="false" :delete="false">
+                                    <a :href="`{{ route('cms.purchase.approval.detail') }}/${value.id}`" class="btn btn-primary">
+                                        <i class="fas fa-eye"></i>
+                                        Ganti Status
                                     </a>
                                 </x-new-update-delete>
                             </tr>
@@ -63,7 +66,7 @@
             document.addEventListener('alpine:init', () => {
                 Alpine.data('data', () => ({
                     isUpdate: false,
-                    modalTitle: 'Buat {{ $title }}',
+                    modalTitle: 'Ganti Status Pembelian',
                     search: '',
                     sort: 'purchases.created_at',
                     order: 'desc',
@@ -94,61 +97,6 @@
                         this.sort = sort
 
                         this.getAllData()
-                    },
-                    create() {
-                        window.Swal.fire({
-                            title: 'Apakah anda yakin ingin menambahkan data baru?',
-                            text: 'Data ini akan ditambahkan',
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonText: 'Yes',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                this.save()
-                            }
-                        })
-                    },
-                    save() {
-                        window.axios.post(this.baseUrl, this.form).then(response => {
-                            this.getAllData()
-
-                            window.Toast.fire({
-                                icon: 'success',
-                                title: response.data.message
-                            })
-                        }).catch(error => {
-                            window.Toast.fire({
-                                icon: 'error',
-                                title: error.response.data.message
-                            })
-                        })
-                    },
-                    confirmDelete(id) {
-                        window.Swal.fire({
-                            title: 'Apakah anda yakin?',
-                            text: 'Data yang di hapus tidak dapat dikembalikan',
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonText: 'Yes',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                this.delete(id)
-                            }
-                        })
-                    },
-                    delete(id) {
-                        window.axios.delete(this.baseUrl + id).then((response) => {
-                            this.getAllData()
-                            window.Toast.fire({
-                                icon: 'success',
-                                title: response.data.message
-                            })
-                        }).catch(error => {
-                            window.Toast.fire({
-                                icon: 'error',
-                                title: error.response.data.message
-                            })
-                        })
                     },
                     init() {
                         this.getAllData()

@@ -15,12 +15,6 @@
                 <div class="col-md-12">
                     <div class="float-end">
                         <button
-                            class="btn btn-warning"
-                            type="reset">
-                            <i class="align-middle" data-feather="refresh-ccw"></i>
-                            Reset
-                        </button>
-                        <button
                             class="btn btn-success"
                             type="submit">
                             <i class="align-middle" data-feather="save"></i>

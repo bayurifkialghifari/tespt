@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 trait WithApiGetFilterData {
 
     public function getDataWithFilter(Model|Builder $model, Request $request, $callback = null, $searchAble = []) {
+        $request->validated();
+
         $new_model = clone $model;
 
         // Get list field available in the model

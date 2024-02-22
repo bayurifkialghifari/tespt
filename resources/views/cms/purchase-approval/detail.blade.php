@@ -12,7 +12,7 @@
     <div class="card" x-data="data">
         <div class="card-header">
             <h5 class="card-title">{{ $title ?? '' }} Data</h5>
-            <a href="{{ route('cms.purchase') }}" class="btn btn-danger">
+            <a href="{{ route('cms.purchase.approval') }}" class="btn btn-danger">
                 <i class="fas fa-arrow-left"></i>
                 Kembali
             </a>
@@ -51,7 +51,24 @@
                 </div>
             </div>
             <div class="table-responsive">
-                <x-new-header :isSearch="false" x-show="detail.status == 0" />
+                <div class="col-md-12" x-show="detail.status == 0">
+                    <div class="float-end">
+                        <button
+                            class="btn btn-success"
+                            x-on:click="approve()"
+                        >
+                            <i class="align-middle" data-feather="check"></i>
+                            Terima
+                        </button>
+                        <button
+                            class="btn btn-danger"
+                            x-on:click="reject()"
+                        >
+                            <i class="align-middle" data-feather="x"></i>
+                            Tolak
+                        </button>
+                    </div>
+                </div>
                 <table class="table table-hover table-striped" style="width:100%">
                     <thead>
                         <tr>
@@ -59,9 +76,6 @@
                             <th>Jumlah</th>
                             <th>Harga</th>
                             <th>Total</th>
-                            <th>
-                                Action
-                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,7 +85,6 @@
                                 <td x-text="new Intl.NumberFormat('id').format(value.quantity)"></td>
                                 <td x-text="new Intl.NumberFormat('id').format(value.price)"></td>
                                 <td x-text="new Intl.NumberFormat('id').format(value.total)"></td>
-                                <x-new-update-delete x-show="detail.status == 0" />
                             </tr>
                         </template>
                     </tbody>
@@ -84,31 +97,14 @@
             <x-new-form x-on:submit.prevent="save">
                 <div class="col-md-12">
                     <div class="mb-3">
-                        <label class="form-label">Barang</label>
-                        <select x-model="form.good_id" class="form-control">
-                            <option value="">--Select Goods--</option>
-                            <template x-for="(value, index) in goods">
-                                <option :value="value.id" x-text="value.name"></option>
-                            </template>
-                        </select>
+                        <label class="form-label">Status</label>
+                        <input type="text" class="form-control" :value="isApprove ? 'Disetujui' : 'Ditolak'" readonly>
                     </div>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-12" x-show="!isApprove">
                     <div class="mb-3">
-                        <label class="form-label">Harga</label>
-                        <input type="number" x-model="form.price" class="form-control" placeholder="Harga" readonly>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="mb-3">
-                        <label class="form-label">Jumlah</label>
-                        <input type="number" x-model="form.quantity" class="form-control" placeholder="Jumlah" x-on:input="calculateTotal()">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="mb-3">
-                        <label class="form-label">Total</label>
-                        <input type="number" x-model="form.total" class="form-control" placeholder="Total" readonly>
+                        <label class="form-label">Keterangan</label>
+                        <textarea class="form-control" x-model="form.reject_reason"></textarea>
                     </div>
                 </div>
             </x-new-form>
@@ -120,8 +116,8 @@
         <script>
             document.addEventListener('alpine:init', () => {
                 Alpine.data('data', () => ({
-                    isUpdate: false,
-                    modalTitle: 'Buat {{ $title }}',
+                    isApprove: false,
+                    modalTitle: 'Persetujuan Pembelian',
                     baseUrl: '/purchase/',
                     form: [],
                     data: [],
@@ -130,12 +126,6 @@
                         purchaseApprovals: {
                             code: '',
                         },
-                    },
-                    goods: [],
-                    getAllGoods() {
-                        window.axios.get('/good-like').then((response) => {
-                            this.goods = response.data.data
-                        })
                     },
                     getAllData() {
                         const url = `${this.baseUrl}{{ request()->route('id') }}`
@@ -151,41 +141,26 @@
                             this.data = res.purchase_details
                         })
                     },
-                    calculateTotal() {
-                        this.form.total = this.form.price * this.form.quantity
-                    },
-                    create() {
-                        this.isUpdate = false
-                        this.modalTitle = 'Buat {{ $title }}'
-                        new bootstrap.Modal(this.$refs.modal).show()
-
+                    approve() {
+                        this.isApprove = true
                         this.form = {
-                            purchase_id: '{{ request()->route('id') }}',
-                            good_id: '',
-                            price: '',
-                            quantity: '',
-                            total: '',
+                            purchase_id: this.detail.id,
+                            is_approved: 1,
+                            reject_reason: '',
                         }
-                    },
-                    update(id) {
-                        this.isUpdate = true
-                        this.modalTitle = 'Update {{ $title }}'
                         new bootstrap.Modal(this.$refs.modal).show()
-
-
-                        window.axios.get(`purchase-detail/${id}`).then((response) => {
-                            this.form = response.data.data
-                        })
+                    },
+                    reject() {
+                        this.isApprove = false
+                        this.form = {
+                            purchase_id: this.detail.id,
+                            is_approved: 0,
+                            reject_reason: '',
+                        }
+                        new bootstrap.Modal(this.$refs.modal).show()
                     },
                     save() {
-                        let request
-                        if (this.isUpdate) {
-                            request = window.axios.put(`purchase-detail/${this.form.id}`, this.form)
-                        } else {
-                            request = window.axios.post('purchase-detail', this.form)
-                        }
-
-                        request.then(response => {
+                        window.axios.post('/purchase-approval', this.form).then((response) => {
                             this.getAllData()
                             const modal = bootstrap.Modal.getInstance(this.$refs.modal)
                             modal.hide()
@@ -193,34 +168,7 @@
                                 icon: 'success',
                                 title: response.data.message
                             })
-                        }).catch(error => {
-                            window.Toast.fire({
-                                icon: 'error',
-                                title: error.response.data.message
-                            })
-                        })
-                    },
-                    confirmDelete(id) {
-                        window.Swal.fire({
-                            title: 'Apakah anda yakin?',
-                            text: 'Data yang di hapus tidak dapat dikembalikan',
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonText: 'Yes',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                this.delete(id)
-                            }
-                        })
-                    },
-                    delete(id) {
-                        window.axios.delete('purchase-detail/' + id).then((response) => {
-                            this.getAllData()
-                            window.Toast.fire({
-                                icon: 'success',
-                                title: response.data.message
-                            })
-                        }).catch(error => {
+                        }).catch((error) => {
                             window.Toast.fire({
                                 icon: 'error',
                                 title: error.response.data.message
@@ -229,17 +177,6 @@
                     },
                     init() {
                         this.getAllData()
-                        this.getAllGoods()
-                        this.$watch('form.good_id', () => {
-                            if(this.form.good_id) {
-                                window.axios.get(`/goods/${this.form.good_id}`).then((response) => {
-                                    this.form.price = response.data.data.price
-
-                                    // calculate total
-                                    this.calculateTotal()
-                                })
-                            }
-                        })
                     }
                 }))
             })

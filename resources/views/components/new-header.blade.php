@@ -13,7 +13,7 @@
             </div>
         @endif
         @if($isCreate)
-            <div class="col-md-{{ $isSearch ? '6' : '12' }}">
+            <div class="col-md-{{ $isSearch ? '6' : '12' }}" {{ $attributes }}>
                 <div class="float-end">
                     <button
                         class="btn btn-success"

@@ -11,24 +11,6 @@ use App\Models\PurchaseApproval;
 
 class PurchaseApprovalController extends Controller
 {
-    public function get(GetAllRequest $request) {
-        return $this->respondWithSuccess($this->getDataWithFilter(new Purchase, $request, callback: function ($model, $request) {
-            $model->join('purchases.users', 'purchases.user_id', '=', 'users.id');
-            $model->leftJoin('purchase_approvals', 'purchases.id', '=', 'purchase_approvals.purchase_id');
-            $model->where('purchases.status', $request->status ?? 0);
-            $model->select('purchases.*', 'users.name as user_name', 'purchase_approvals.code as approval_code');
-
-            return $model;
-        }, searchAble: [
-            'users.name',
-            'purchases.total_price',
-            'purchases.total_items',
-            'purchases.status',
-            'purchases.created_at',
-            'purchase_approvals.code',
-        ]));
-    }
-
     public function changeStatus(ChangeStatusRequest $request) {
         $request->validated();
 

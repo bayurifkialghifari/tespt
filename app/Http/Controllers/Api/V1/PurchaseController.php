@@ -11,6 +11,11 @@ class PurchaseController extends Controller
 {
     public function get(GetAllRequest $request) {
         return $this->respondWithSuccess($this->getDataWithFilter(new Purchase, $request, callback: function ($model, $request) {
+
+            if($request->status != 'all') {
+                $model->where('purchases.status', $request->status ?? 0);
+            }
+
             $model->where('purchases.user_id', $request->user()->id);
             $model->leftJoin('purchase_approvals', 'purchases.id', '=', 'purchase_approvals.purchase_id');
             $model->join('users', 'purchases.user_id', '=', 'users.id');

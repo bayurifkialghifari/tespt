@@ -15,6 +15,24 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="list-group list-group-horizontal mb-2">
+                            <button class="list-group-item" x-on:click="filterStatus('all')" :class="status == 'all' ? 'active' : ''">
+                                Semua
+                            </button>
+                            <button class="list-group-item" x-on:click="filterStatus('0')" :class="status == '0' ? 'active' : ''">
+                                Menunggu Persetujuan
+                            </button>
+                            <button class="list-group-item" x-on:click="filterStatus('1')" :class="status == '1' ? 'active' : ''">
+                                Disetujui
+                            </button>
+                            <button class="list-group-item" x-on:click="filterStatus('2')" :class="status == '2' ? 'active' : ''">
+                                Ditolak
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <x-new-header :isCreate="false" />
                 <table class="table table-hover table-striped" style="width:100%">
                     <thead>
@@ -73,9 +91,15 @@
                     current_page: 1,
                     total_page: null,
                     baseUrl: '/purchase/',
+                    status: 'all',
                     data: [],
+                    filterStatus(status) {
+                        this.status = status
+
+                        this.getAllData()
+                    },
                     getAllData() {
-                        const url = `${this.baseUrl}?sort=${this.sort}&order=${this.order}&search=${this.search}&page=${this.current_page}`
+                        const url = `${this.baseUrl}?sort=${this.sort}&order=${this.order}&search=${this.search}&page=${this.current_page}&status=${this.status}`
 
                         window.axios.get(url).then((response) => {
                             const res = response.data.data
